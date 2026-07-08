@@ -1,0 +1,41 @@
+name: Deploy Auth Service
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script: |
+            set -e
+            cd "${{ secrets.DEPLOY_PATH }}"
+
+            echo "Updating repository..."
+            git fetch origin main
+            git reset --hard origin/main
+
+            echo "Building Docker image..."
+            docker build -t auth-service:latest .
+
+            echo "Restarting container..."
+            docker rm -f auth-service >/dev/null 2>&1 || true
+            docker run -d \
+              --name auth-service \
+              --restart unless-stopped \
+              -p 3001:3001 \
+              --env-file .env \
+              auth-service:latest
+
+            echo "Deployment completed successfully."
