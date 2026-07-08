@@ -25,6 +25,10 @@ jobs:
           docker build -t auth-service:latest .
 
           Write-Host "Restarting container..."
+          if (-not (Test-Path .env)) {
+            throw ".env file not found in the repository root on the runner machine. Create it before running the workflow."
+          }
+
           try {
             docker rm -f auth-service 2>$null | Out-Null
           } catch {
