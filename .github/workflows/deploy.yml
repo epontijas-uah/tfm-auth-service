@@ -19,27 +19,27 @@ jobs:
       - name: Build and deploy with Docker
         shell: powershell
         run: |
-          $ErrorActionPreference = 'Stop'
+            $ErrorActionPreference = 'Stop'
 
-          Write-Host "Building Docker image..."
-          docker build -t auth-service:latest .
+            Write-Host "Building Docker image..."
+            docker build -t auth-service:latest .
 
-          Write-Host "Restarting container..."
-          docker rm -f auth-service 2>$null | Out-Null
+            Write-Host "Restarting container..."
+            try { docker rm -f auth-service 2>$null | Out-Null } catch {}
 
-          if (Test-Path .env) {
+            if (Test-Path .env) {
             docker run -d `
-              --name auth-service `
-              --restart unless-stopped `
-              -p 3001:3001 `
-              --env-file .env `
-              auth-service:latest
-          } else {
+                --name auth-service `
+                --restart unless-stopped `
+                -p 3001:3001 `
+                --env-file .env `
+                auth-service:latest
+            } else {
             docker run -d `
-              --name auth-service `
-              --restart unless-stopped `
-              -p 3001:3001 `
-              auth-service:latest
-          }
+                --name auth-service `
+                --restart unless-stopped `
+                -p 3001:3001 `
+                auth-service:latest
+            }
 
-          Write-Host "Deployment completed successfully."
+            Write-Host "Deployment completed successfully."
