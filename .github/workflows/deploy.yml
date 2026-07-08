@@ -25,8 +25,12 @@ jobs:
           docker build -t auth-service:latest .
 
           Write-Host "Restarting container..."
-          if (-not (Test-Path .env)) {
-            throw ".env file not found in the repository root on the runner machine. Create it before running the workflow."
+          if (Test-Path .env) {
+            $envArgs = @('--env-file', '.env')
+            Write-Host ".env file found; using it for the container."
+          } else {
+            $envArgs = @()
+            Write-Host ".env file not found; starting container without it."
           }
 
           try {
@@ -38,7 +42,7 @@ jobs:
             --name auth-service `
             --restart unless-stopped `
             -p 3001:3001 `
-            --env-file .env `
+            @envArgs `
             auth-service:latest
 
           Write-Host "Deployment completed successfully."
