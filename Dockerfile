@@ -1,5 +1,5 @@
 # Usamos una imagen de Node que incluye herramientas de compilación (necesarias para sqlite3)
-FROM node:20-slim as builder
+FROM node:20-slim AS builder
 
 # Instalar dependencias necesarias para compilar módulos nativos (C++)
 RUN apt-get update && apt-get install -y \
