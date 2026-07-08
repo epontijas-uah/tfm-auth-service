@@ -8,34 +8,29 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
-      - name: Deploy over SSH
-        uses: appleboy/ssh-action@v1.0.0
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.SSH_PORT || 22 }}
-          script: |
-            set -e
-            cd "${{ secrets.DEPLOY_PATH }}"
+          fetch-depth: 0
 
-            echo "Updating repository..."
-            git fetch origin main
-            git reset --hard origin/main
+      - name: Build and deploy with Docker
+        shell: bash
+        run: |
+          set -e
 
-            echo "Building Docker image..."
-            docker build -t auth-service:latest .
+          echo "Building Docker image..."
+          docker build -t auth-service:latest .
 
-            echo "Restarting container..."
-            docker rm -f auth-service >/dev/null 2>&1 || true
-            docker run -d \
-              --name auth-service \
-              --restart unless-stopped \
-              -p 3001:3001 \
-              --env-file .env \
-              auth-service:latest
+          echo "Restarting container..."
+          docker rm -f auth-service >/dev/null 2>&1 || true
+          docker run -d \
+            --name auth-service \
+            --restart unless-stopped \
+            -p 3001:3001 \
+            --env-file .env \
+            auth-service:latest
 
-            echo "Deployment completed successfully."
+          echo "Deployment completed successfully."

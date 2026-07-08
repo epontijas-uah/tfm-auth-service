@@ -1,0 +1,11 @@
+﻿{
+  "agentId": 2,
+  "agentName": "self-hosted",
+  "poolId": 1,
+  "poolName": "Default",
+  "serverUrl": "https://pipelinesghubeus25.actions.githubusercontent.com/7rbp6b1AD2Dp2AV0tuEmw3y8sIgvNLQamAw5JHN57GB36qjBVa/",
+  "gitHubUrl": "https://github.com/epontijas-uah/tfm-auth-service",
+  "workFolder": "_work",
+  "useV2Flow": true,
+  "serverUrlV2": "https://broker.actions.githubusercontent.com/"
+}
