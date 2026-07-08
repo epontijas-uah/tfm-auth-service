@@ -17,20 +17,20 @@ jobs:
           fetch-depth: 0
 
       - name: Build and deploy with Docker
-        shell: bash
+        shell: pwsh
         run: |
-          set -e
+          $ErrorActionPreference = 'Stop'
 
-          echo "Building Docker image..."
+          Write-Host "Building Docker image..."
           docker build -t auth-service:latest .
 
-          echo "Restarting container..."
-          docker rm -f auth-service >/dev/null 2>&1 || true
-          docker run -d \
-            --name auth-service \
-            --restart unless-stopped \
-            -p 3001:3001 \
-            --env-file .env \
+          Write-Host "Restarting container..."
+          docker rm -f auth-service 2>$null | Out-Null
+          docker run -d `
+            --name auth-service `
+            --restart unless-stopped `
+            -p 3001:3001 `
+            --env-file .env `
             auth-service:latest
 
-          echo "Deployment completed successfully."
+          Write-Host "Deployment completed successfully."
