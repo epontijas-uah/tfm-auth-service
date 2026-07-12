@@ -1,10 +1,13 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const db = require('../db');
 
 const router = express.Router();
 const SALT_ROUNDS = 10;
+
+function getDb() {
+  return require('../db');
+}
 
 router.post('/register', async (req, res) => {
   const { username, pin } = req.body;
@@ -17,6 +20,7 @@ router.post('/register', async (req, res) => {
     return res.status(400).json({ error: 'El PIN debe ser exactamente 4 dígitos numéricos' });
   }
 
+  const db = getDb();
   const existingUser = db.prepare('SELECT id FROM users WHERE username = ?').get(username);
   if (existingUser) {
     return res.status(409).json({ error: 'El nombre de usuario ya está en uso' });
@@ -35,6 +39,7 @@ router.post('/login', async (req, res) => {
     return res.status(400).json({ error: 'Username y PIN son obligatorios' });
   }
 
+  const db = getDb();
   const user = db.prepare('SELECT * FROM users WHERE username = ?').get(username);
   if (!user) {
     return res.status(401).json({ error: 'Credenciales incorrectas' });
